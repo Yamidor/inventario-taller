@@ -173,16 +173,28 @@ const Factura = () => {
     if (!validarCliente()) return;
 
     const doc = new jsPDF();
-    doc.text("Taller Moto Repuestos RC", 10, 10);
-    doc.text("Dirección: Calle Falsa 123", 10, 20);
-    doc.text("Contacto: 555-555-555", 10, 30);
-    doc.text(`Factura: ${numeroFactura}`, 10, 40);
-    doc.text(`Cliente: ${cliente.nombre_cliente}`, 10, 50);
-    doc.text(`DNI: ${cliente.dni_cliente}`, 10, 60);
-    doc.text(`Tipo Cliente: ${cliente.tipo_cliente}`, 10, 70);
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const centerText = (text, y, fontSize = 10) => {
+      doc.setFontSize(fontSize);
+      const textWidth = doc.getTextWidth(text);
+      const x = (pageWidth - textWidth) / 2;
+      doc.text(text, x, y);
+    };
+
+    centerText(
+      "Taller Moto Repuestos RC, Dirección: Calle Falsa 123, Contacto: 555-555-555",
+      10,
+      9
+    );
+    centerText(
+      `Factura: ${numeroFactura}, Cliente: ${cliente.nombre_cliente}, DNI: ${cliente.dni_cliente}, Tipo Cliente: ${cliente.tipo_cliente}`,
+      15,
+      9
+    );
 
     doc.autoTable({
-      startY: 80,
+      startY: 20,
       head: [["Código", "Nombre", "Cantidad", "Precio de Venta", "Total"]],
       body: factura.map((item) => [
         item.codigo,
@@ -193,21 +205,12 @@ const Factura = () => {
       ]),
     });
 
-    doc.text(
-      `Sub-Total: $${calcularSubTotal().toFixed(2)}`,
-      10,
-      doc.autoTable.previous.finalY + 10
-    );
-    doc.text(
-      `Impuesto: $${calcularImpuesto().toFixed(2)}`,
-      10,
-      doc.autoTable.previous.finalY + 20
-    );
-    doc.text(
-      `Total: $${calcularTotal().toFixed(2)}`,
-      10,
-      doc.autoTable.previous.finalY + 30
-    );
+    const finalY = doc.autoTable.previous.finalY;
+
+    doc.setFontSize(10);
+    doc.text(`Sub-Total: $${calcularSubTotal().toFixed(2)}`, 15, finalY + 10);
+    doc.text(`Impuesto: $${calcularImpuesto().toFixed(2)}`, 15, finalY + 20);
+    doc.text(`Total: $${calcularTotal().toFixed(2)}`, 15, finalY + 30);
 
     doc.save("factura.pdf");
   };
