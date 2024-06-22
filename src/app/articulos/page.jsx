@@ -41,7 +41,7 @@ const Articulos = () => {
               <label for="nombre" class="block text-gray-700">Nombre</label>
               <input type="text" id="nombre" name="nombre" class="w-full px-3 py-2 border rounded" value="${
                 articulo ? articulo.nombre : ""
-              }" readonly>
+              }">
             </div>
           </div>
           <div class="mb-4">
