@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Inventario {
+  id         Int      @id @default(autoincrement())
+  articuloId Int      @unique
+  unidades   Int
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+}
+
+model Articulo {
+  id            Int         @id @default(autoincrement())
+  codigo        String      @unique
+  nombre        String
+  imagen        String?
+  descripcion   String?
+  tipo          String
+  precio_compra Decimal     @default(0.0)
+  precio_venta  Decimal     @default(0.0)
+  Inventario    Inventario?
+  ventas        Venta[]
+  compras       Compra[]
+}
+
+model Venta {
+  id            Int      @id @default(autoincrement())
+  articuloId    Int
+  cantidad      Int
+  precio_compra Decimal  @default(0.0)
+  precio_venta  Decimal  @default(0.0)
+  fecha         DateTime @default(now())
+  articulo      Articulo @relation(fields: [articuloId], references: [id])
+  facturaId     Int
+  factura       Factura  @relation(fields: [facturaId], references: [id])
+}
+
+model Factura {
+  id             Int      @id @default(autoincrement())
+  nombre_cliente String
+  dni_cliente    String
+  tipo_cliente   String
+  numero         String   @default("")
+  fecha          DateTime @default(now())
+  sub_total      Decimal  @default(0.0)
+  impuesto       Decimal  @default(0.0)
+  total          Decimal  @default(0.0)
+  ventas         Venta[]
+}
+
+model Compra {
+  id           Int      @id @default(autoincrement())
+  articuloId   Int
+  cantidad     Int
+  valor_unidad Decimal  @default(0.0)
+  fecha        DateTime @default(now())
+  tipo_pago    String
+  pagado       Boolean
+  total        Decimal  @default(0.0)
+  articulo     Articulo @relation(fields: [articuloId], references: [id])
+}
